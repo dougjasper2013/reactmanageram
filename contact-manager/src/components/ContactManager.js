@@ -14,31 +14,45 @@ const ContactManager = () => {
   };
 
   return (
-    <div>
-      <h2>Contact Manager</h2>
-      <div>
-        <input
-          type="text"
-          placeholder="Name"
-          value={contactName}
-          onChange={(e) => setContactName(e.target.value)}
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={contactEmail}
-          onChange={(e) => setContactEmail(e.target.value)}
-        />
-        <button onClick={addContact}>Add Contact</button>
+    <div className="container">
+      <h2 className="my-4">Contact Manager</h2>
+      
+      <div className="mb-4">
+        <div className="mb-3">
+          <label htmlFor="contactName" className="form-label">Contact Name</label>
+          <input
+            type="text"
+            className="form-control"
+            id="contactName"
+            placeholder="Enter contact's name"
+            value={contactName}
+            onChange={(e) => setContactName(e.target.value)}
+          />
+        </div>
+        <div className="mb-3">
+          <label htmlFor="contactEmail" className="form-label">Contact Email</label>
+          <input
+            type="email"
+            className="form-control"
+            id="contactEmail"
+            placeholder="Enter contact's email"
+            value={contactEmail}
+            onChange={(e) => setContactEmail(e.target.value)}
+          />
+        </div>
+        <button onClick={addContact} className="btn btn-primary">Add Contact</button>
       </div>
 
-      <ul>
-        {contacts.map((contact, index) => (
-          <li key={index}>
-            {contact.name} - {contact.email}
-          </li>
-        ))}
-      </ul>
+      <div>
+        <h3>Contacts List</h3>
+        <ul className="list-group">
+          {contacts.map((contact, index) => (
+            <li key={index} className="list-group-item">
+              <strong>{contact.name}</strong> - {contact.email}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };

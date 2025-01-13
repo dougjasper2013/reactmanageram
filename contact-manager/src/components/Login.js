@@ -9,19 +9,25 @@ const Login = ({ loginUser }) => {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
+    <div className="container">
+      <h2 className="my-4">Login</h2>
       <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Enter your username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <button type="submit">Login</button>
+        <div className="mb-3">
+          <label htmlFor="username" className="form-label">Username</label>
+          <input
+            type="text"
+            className="form-control"
+            id="username"
+            placeholder="Enter your username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+        </div>
+        <button type="submit" className="btn btn-primary">Login</button>
       </form>
     </div>
   );
 };
 
 export default Login;
+
