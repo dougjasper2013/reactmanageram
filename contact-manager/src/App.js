@@ -6,10 +6,21 @@ import Register from './components/Register';
 import ContactManager from './components/ContactManager';
 
 function App() {
-  const [user, setUser] = useState(null); // Manage logged-in user
+  const [user, setUser] = useState(() => {
+    // Check if there is a user in localStorage (if the user is logged in already)
+    const storedUser = localStorage.getItem('user');
+    return storedUser ? JSON.parse(storedUser).username : null;
+  });
 
-  const loginUser = (username) => setUser(username);
-  const logoutUser = () => setUser(null);
+  const loginUser = (username) => {
+    setUser(username);
+  };
+
+  const logoutUser = () => {
+    // Remove user from localStorage and set user state to null
+    // localStorage.removeItem('user');
+    setUser(null);
+  };
 
   return (
     <Router>
@@ -34,4 +45,3 @@ function App() {
 }
 
 export default App;
-

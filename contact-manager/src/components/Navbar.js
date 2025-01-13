@@ -35,4 +35,3 @@ const Navbar = ({ user, logoutUser }) => {
 };
 
 export default Navbar;
-
