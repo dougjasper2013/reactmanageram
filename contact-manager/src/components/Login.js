@@ -26,7 +26,9 @@ function Login() {
       // User found, log them in
       localStorage.setItem('loggedIn', JSON.stringify(true));
       localStorage.setItem('loggedInUser', email); // Store the logged-in user's email
-      navigate('/contacts'); // Redirect to the ContactManager page
+
+      // Redirect to the ContactManager page
+      navigate('/contacts');
     } else {
       setError('Invalid email or password.');
     }

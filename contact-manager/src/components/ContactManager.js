@@ -1,67 +1,83 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function ContactManager() {
+  const navigate = useNavigate();
   const [contacts, setContacts] = useState([]);
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [newContactName, setNewContactName] = useState('');
+  const [newContactEmail, setNewContactEmail] = useState('');
+  const [error, setError] = useState('');
 
-  // Load contacts from localStorage when the component mounts
+  // Get the logged-in user's email
+  const loggedInUser = localStorage.getItem('loggedInUser');
+
   useEffect(() => {
-    const storedContacts = JSON.parse(localStorage.getItem('contacts')) || [];
-    setContacts(storedContacts);
-  }, []);
-
-  // Handle adding a new contact
-  const handleAddContact = (e) => {
-    e.preventDefault();
-    if (name && email) {
-      const newContact = { name, email };
-      const updatedContacts = [...contacts, newContact];
-      setContacts(updatedContacts);
-      localStorage.setItem('contacts', JSON.stringify(updatedContacts));
-      setName('');
-      setEmail('');
+    if (!loggedInUser) {
+      // If the user is not logged in, redirect to the login page
+      navigate('/login');
     } else {
-      alert('Please fill in both name and email.');
+      // Load the user's contact list from localStorage
+      const userContacts = JSON.parse(localStorage.getItem(`contacts_${loggedInUser}`)) || [];
+      setContacts(userContacts);
     }
+  }, [loggedInUser, navigate]);
+
+  const handleAddContact = () => {
+    if (!newContactName || !newContactEmail) {
+      setError('Please provide both name and email for the contact.');
+      return;
+    }
+
+    // Create a new contact object
+    const newContact = { name: newContactName, email: newContactEmail };
+
+    // Update the contacts in localStorage
+    const updatedContacts = [...contacts, newContact];
+    localStorage.setItem(`contacts_${loggedInUser}`, JSON.stringify(updatedContacts));
+    setContacts(updatedContacts);
+    setNewContactName('');
+    setNewContactEmail('');
+    setError('');
   };
 
   return (
-    <div>
-      <h2 className="text-center mb-4">My Contacts</h2>
+    <div className="container">
+      <h2>Contact Manager</h2>
+      {error && <div className="alert alert-danger">{error}</div>}
 
-      {/* Add Contact Form */}
-      <form onSubmit={handleAddContact} className="mb-4">
-        <div className="input-group">
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <input
-            type="email"
-            className="form-control"
-            placeholder="Email Address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <button type="submit" className="btn btn-primary">Add Contact</button>
-        </div>
-      </form>
+      <div className="mb-3">
+        <label htmlFor="contactName" className="form-label">Contact Name</label>
+        <input 
+          type="text" 
+          className="form-control" 
+          id="contactName" 
+          placeholder="Enter contact's name" 
+          value={newContactName}
+          onChange={(e) => setNewContactName(e.target.value)} 
+        />
+      </div>
 
-      {/* Display Contacts */}
-      <ul className="list-group">
-        {contacts.length === 0 ? (
-          <li className="list-group-item">No contacts found. Add a contact!</li>
-        ) : (
-          contacts.map((contact, index) => (
-            <li key={index} className="list-group-item">
-              {contact.name} - {contact.email}
-            </li>
-          ))
-        )}
+      <div className="mb-3">
+        <label htmlFor="contactEmail" className="form-label">Contact Email</label>
+        <input 
+          type="email" 
+          className="form-control" 
+          id="contactEmail" 
+          placeholder="Enter contact's email"
+          value={newContactEmail}
+          onChange={(e) => setNewContactEmail(e.target.value)} 
+        />
+      </div>
+
+      <button onClick={handleAddContact} className="btn btn-primary">Add Contact</button>
+
+      <h3 className="mt-4">My Contacts</h3>
+      <ul className="list-group mt-3">
+        {contacts.map((contact, index) => (
+          <li key={index} className="list-group-item">
+            <strong>{contact.name}</strong> - {contact.email}
+          </li>
+        ))}
       </ul>
     </div>
   );

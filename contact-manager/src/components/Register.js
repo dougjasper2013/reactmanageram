@@ -10,7 +10,7 @@ function Register() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Simple validation (can be extended with more checks)
+    // Simple validation
     if (!email || !password) {
       setError('Please provide both email and password.');
       return;
@@ -31,6 +31,10 @@ function Register() {
 
     // Store the updated users array in localStorage
     localStorage.setItem('users', JSON.stringify(storedUsers));
+
+    // Initialize an empty contact list for the new user
+    const userContacts = [];
+    localStorage.setItem(`contacts_${email}`, JSON.stringify(userContacts));
 
     // Log the user in by setting login state
     localStorage.setItem('loggedIn', JSON.stringify(true)); // Mark as logged in
