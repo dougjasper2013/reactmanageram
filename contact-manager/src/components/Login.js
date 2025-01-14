@@ -1,55 +1,53 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const Login = ({ loginUser }) => {
-  const [username, setUsername] = useState('');
+function Login() {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleLogin = (e) => {
     e.preventDefault();
-
-    // Retrieve the user object from localStorage
-    const storedUser = JSON.parse(localStorage.getItem('user'));
-
-    // Check if user exists and the password matches
-    if (storedUser && storedUser.username === username && storedUser.password === password) {
-      loginUser(username);  // Log in the user
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const user = users.find((user) => user.email === email && user.password === password);
+    
+    if (user) {
+      localStorage.setItem('loggedIn', JSON.stringify(user));
+      localStorage.setItem('loggedInUser', user.email);  // Store the username or email
+      navigate('/contacts');
     } else {
-      setError('Invalid username or password');  // Show error if credentials are incorrect
+      alert('Invalid credentials');
     }
   };
 
   return (
-    <div className="container">
-      <h2 className="my-4">Login</h2>
-      {error && <div className="alert alert-danger">{error}</div>}
-      <form onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <label htmlFor="username" className="form-label">Username</label>
-          <input
-            type="text"
-            className="form-control"
-            id="username"
-            placeholder="Enter your username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        </div>
-        <div className="mb-3">
-          <label htmlFor="password" className="form-label">Password</label>
-          <input
-            type="password"
-            className="form-control"
-            id="password"
-            placeholder="Enter your password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-        <button type="submit" className="btn btn-primary">Login</button>
-      </form>
+    <div className="row justify-content-center">
+      <div className="col-md-4">
+        <h2 className="text-center mb-4">Login</h2>
+        <form onSubmit={handleLogin}>
+          <div className="mb-3">
+            <input
+              type="email"
+              className="form-control"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div className="mb-3">
+            <input
+              type="password"
+              className="form-control"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+          <button type="submit" className="btn btn-primary w-100">Login</button>
+        </form>
+      </div>
     </div>
   );
-};
+}
 
 export default Login;

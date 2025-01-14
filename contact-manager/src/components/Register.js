@@ -1,52 +1,67 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const Register = ({ loginUser }) => {
-  const [username, setUsername] = useState('');
+function Register() {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Create a new user object
-    const newUser = { username, password };
+    // Simple validation (can be extended with more checks)
+    if (!email || !password) {
+      setError('Please provide both email and password.');
+      return;
+    }
 
-    // Save the user to localStorage (simulating a simple user database)
-    localStorage.setItem('user', JSON.stringify(newUser));
+    // Simulate registration (in a real app, you'd save this to your backend)
+    setTimeout(() => {
+      // Save the user's email and login state to localStorage
+      localStorage.setItem('loggedIn', JSON.stringify(true)); // Mark as logged in
+      localStorage.setItem('loggedInUser', email); // Store the email or username
 
-    // Automatically log the user in
-    loginUser(username);
+      // Clear any previous errors
+      setError('');
+
+      // Redirect to the ContactManager (home page after login)
+      navigate('/contacts');
+    }, 1000); // Simulate a delay (e.g., an API call)
+
   };
 
   return (
     <div className="container">
-      <h2 className="my-4">Register</h2>
+      <h2>Register</h2>
       <form onSubmit={handleSubmit}>
+        {error && <div className="alert alert-danger">{error}</div>}
         <div className="mb-3">
-          <label htmlFor="username" className="form-label">Choose a Username</label>
-          <input
-            type="text"
-            className="form-control"
-            id="username"
-            placeholder="Enter your username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+          <label htmlFor="email" className="form-label">Email</label>
+          <input 
+            type="email" 
+            className="form-control" 
+            id="email" 
+            value={email} 
+            onChange={(e) => setEmail(e.target.value)} 
+            required 
           />
         </div>
         <div className="mb-3">
           <label htmlFor="password" className="form-label">Password</label>
-          <input
-            type="password"
-            className="form-control"
-            id="password"
-            placeholder="Choose a password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+          <input 
+            type="password" 
+            className="form-control" 
+            id="password" 
+            value={password} 
+            onChange={(e) => setPassword(e.target.value)} 
+            required 
           />
         </div>
-        <button type="submit" className="btn btn-success">Register</button>
+        <button type="submit" className="btn btn-primary">Register</button>
       </form>
     </div>
   );
-};
+}
 
 export default Register;

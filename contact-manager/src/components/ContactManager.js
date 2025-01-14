@@ -1,77 +1,70 @@
 import React, { useState, useEffect } from 'react';
 
-const ContactManager = () => {
-  // Load contacts from localStorage or initialize an empty array
-  const loadContactsFromStorage = () => {
-    const savedContacts = localStorage.getItem('contacts');
-    return savedContacts ? JSON.parse(savedContacts) : [];
-  };
+function ContactManager() {
+  const [contacts, setContacts] = useState([]);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
 
-  const [contacts, setContacts] = useState(loadContactsFromStorage);
-  const [contactName, setContactName] = useState('');
-  const [contactEmail, setContactEmail] = useState('');
-
-  // Save contacts to localStorage whenever the contacts array changes
+  // Load contacts from localStorage when the component mounts
   useEffect(() => {
-    localStorage.setItem('contacts', JSON.stringify(contacts));
-  }, [contacts]);
+    const storedContacts = JSON.parse(localStorage.getItem('contacts')) || [];
+    setContacts(storedContacts);
+  }, []);
 
-  const addContact = () => {
-    if (contactName && contactEmail) {
-      const newContact = { name: contactName, email: contactEmail };
+  // Handle adding a new contact
+  const handleAddContact = (e) => {
+    e.preventDefault();
+    if (name && email) {
+      const newContact = { name, email };
       const updatedContacts = [...contacts, newContact];
       setContacts(updatedContacts);
-      setContactName('');
-      setContactEmail('');
+      localStorage.setItem('contacts', JSON.stringify(updatedContacts));
+      setName('');
+      setEmail('');
+    } else {
+      alert('Please fill in both name and email.');
     }
   };
 
   return (
-    <div className="container">
-      <h2 className="my-4">Contact Manager</h2>
+    <div>
+      <h2 className="text-center mb-4">My Contacts</h2>
 
-      <div className="mb-4">
-        <div className="mb-3">
-          <label htmlFor="contactName" className="form-label">Contact Name</label>
+      {/* Add Contact Form */}
+      <form onSubmit={handleAddContact} className="mb-4">
+        <div className="input-group">
           <input
             type="text"
             className="form-control"
-            id="contactName"
-            placeholder="Enter contact's name"
-            value={contactName}
-            onChange={(e) => setContactName(e.target.value)}
+            placeholder="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
           />
-        </div>
-        <div className="mb-3">
-          <label htmlFor="contactEmail" className="form-label">Contact Email</label>
           <input
             type="email"
             className="form-control"
-            id="contactEmail"
-            placeholder="Enter contact's email"
-            value={contactEmail}
-            onChange={(e) => setContactEmail(e.target.value)}
+            placeholder="Email Address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
+          <button type="submit" className="btn btn-primary">Add Contact</button>
         </div>
-        <button onClick={addContact} className="btn btn-primary">Add Contact</button>
-      </div>
+      </form>
 
-      <div>
-        <h3>Contacts List</h3>
-        <ul className="list-group">
-          {contacts.length === 0 ? (
-            <li className="list-group-item">No contacts yet!</li>
-          ) : (
-            contacts.map((contact, index) => (
-              <li key={index} className="list-group-item">
-                <strong>{contact.name}</strong> - {contact.email}
-              </li>
-            ))
-          )}
-        </ul>
-      </div>
+      {/* Display Contacts */}
+      <ul className="list-group">
+        {contacts.length === 0 ? (
+          <li className="list-group-item">No contacts found. Add a contact!</li>
+        ) : (
+          contacts.map((contact, index) => (
+            <li key={index} className="list-group-item">
+              {contact.name} - {contact.email}
+            </li>
+          ))
+        )}
+      </ul>
     </div>
   );
-};
+}
 
 export default ContactManager;
