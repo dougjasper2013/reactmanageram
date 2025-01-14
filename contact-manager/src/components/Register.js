@@ -16,19 +16,28 @@ function Register() {
       return;
     }
 
-    // Simulate registration (in a real app, you'd save this to your backend)
-    setTimeout(() => {
-      // Save the user's email and login state to localStorage
-      localStorage.setItem('loggedIn', JSON.stringify(true)); // Mark as logged in
-      localStorage.setItem('loggedInUser', email); // Store the email or username
+    // Get the list of registered users from localStorage (if any)
+    const storedUsers = JSON.parse(localStorage.getItem('users')) || [];
 
-      // Clear any previous errors
-      setError('');
+    // Check if the user already exists
+    if (storedUsers.some(user => user.email === email)) {
+      setError('This email is already registered.');
+      return;
+    }
 
-      // Redirect to the ContactManager (home page after login)
-      navigate('/contacts');
-    }, 1000); // Simulate a delay (e.g., an API call)
+    // Add the new user to the users array
+    const newUser = { email, password };
+    storedUsers.push(newUser);
 
+    // Store the updated users array in localStorage
+    localStorage.setItem('users', JSON.stringify(storedUsers));
+
+    // Log the user in by setting login state
+    localStorage.setItem('loggedIn', JSON.stringify(true)); // Mark as logged in
+    localStorage.setItem('loggedInUser', email); // Store the email of the logged-in user
+
+    // Redirect to the ContactManager (home page after login)
+    navigate('/contacts');
   };
 
   return (
