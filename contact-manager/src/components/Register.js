@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 function Register() {
   const [email, setEmail] = useState('');
@@ -7,41 +8,27 @@ function Register() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Simple validation
     if (!email || !password) {
       setError('Please provide both email and password.');
       return;
     }
 
-    // Get the list of registered users from localStorage (if any)
-    const storedUsers = JSON.parse(localStorage.getItem('users')) || [];
-
-    // Check if the user already exists
-    if (storedUsers.some(user => user.email === email)) {
-      setError('This email is already registered.');
-      return;
+    try {
+      // Send registration request to the PHP backend
+      const response = await axios.post('http://localhost/api/register.php', { email, password });
+      
+      if (response.data.success) {
+        // If registration is successful, log the user in and redirect
+        navigate('/contacts');
+      } else {
+        setError(response.data.message);
+      }
+    } catch (error) {
+      setError('Error registering user.');
     }
-
-    // Add the new user to the users array
-    const newUser = { email, password };
-    storedUsers.push(newUser);
-
-    // Store the updated users array in localStorage
-    localStorage.setItem('users', JSON.stringify(storedUsers));
-
-    // Initialize an empty contact list for the new user
-    const userContacts = [];
-    localStorage.setItem(`contacts_${email}`, JSON.stringify(userContacts));
-
-    // Log the user in by setting login state
-    localStorage.setItem('loggedIn', JSON.stringify(true)); // Mark as logged in
-    localStorage.setItem('loggedInUser', email); // Store the email of the logged-in user
-
-    // Redirect to the ContactManager (home page after login)
-    navigate('/contacts');
   };
 
   return (

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 function ContactManager() {
   const navigate = useNavigate();
@@ -8,36 +9,52 @@ function ContactManager() {
   const [newContactEmail, setNewContactEmail] = useState('');
   const [error, setError] = useState('');
 
-  // Get the logged-in user's email
-  const loggedInUser = localStorage.getItem('loggedInUser');
+  const loggedInUser = localStorage.getItem('loggedInUser'); // Assuming it's stored after login
+  console.log(loggedInUser);
 
   useEffect(() => {
     if (!loggedInUser) {
-      // If the user is not logged in, redirect to the login page
       navigate('/login');
     } else {
-      // Load the user's contact list from localStorage
-      const userContacts = JSON.parse(localStorage.getItem(`contacts_${loggedInUser}`)) || [];
-      setContacts(userContacts);
+      // Fetch contacts from the PHP backend
+      const fetchContacts = async () => {
+        try {
+          const response = await axios.get(`http://localhost/api/contacts.php?user=${loggedInUser}`);
+          setContacts(response.data.contacts);
+        } catch (error) {
+          setError('Error fetching contacts.');
+        }
+      };
+      fetchContacts();
     }
   }, [loggedInUser, navigate]);
 
-  const handleAddContact = () => {
+  const handleAddContact = async () => {
     if (!newContactName || !newContactEmail) {
       setError('Please provide both name and email for the contact.');
       return;
     }
 
-    // Create a new contact object
-    const newContact = { name: newContactName, email: newContactEmail };
+    try {
+      // Add a new contact through the PHP backend
+      const response = await axios.post('http://localhost/api/add_contact.php', { 
+        user: loggedInUser, 
+        name: newContactName, 
+        email: newContactEmail 
+      });
 
-    // Update the contacts in localStorage
-    const updatedContacts = [...contacts, newContact];
-    localStorage.setItem(`contacts_${loggedInUser}`, JSON.stringify(updatedContacts));
-    setContacts(updatedContacts);
-    setNewContactName('');
-    setNewContactEmail('');
-    setError('');
+      if (response.data.success) {
+        // Refresh the contact list
+        setContacts(prevContacts => [...prevContacts, { name: newContactName, email: newContactEmail }]);
+        setNewContactName('');
+        setNewContactEmail('');
+        setError('');
+      } else {
+        setError(response.data.message);
+      }
+    } catch (error) {
+      setError('Error adding contact.');
+    }
   };
 
   return (

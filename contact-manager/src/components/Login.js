@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -7,30 +8,30 @@ function Login() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate email and password fields
     if (!email || !password) {
       setError('Please provide both email and password.');
       return;
     }
 
-    // Get the list of users from localStorage
-    const storedUsers = JSON.parse(localStorage.getItem('users')) || [];
+    try {
+      // Send login request to the PHP backend
+      const response = await axios.post('http://localhost/api/login.php', { email, password });
 
-    // Find the user by email and check the password
-    const user = storedUsers.find(user => user.email === email && user.password === password);
-
-    if (user) {
-      // User found, log them in
-      localStorage.setItem('loggedIn', JSON.stringify(true));
-      localStorage.setItem('loggedInUser', email); // Store the logged-in user's email
-
-      // Redirect to the ContactManager page
-      navigate('/contacts');
-    } else {
-      setError('Invalid email or password.');
+      if (response.data.success) {
+        localStorage.setItem('loggedIn', JSON.stringify(true));
+        // If login is successful, store email in localStorage
+        localStorage.setItem('loggedInUser', email);
+        
+        // Redirect to the contacts page
+        navigate('/contacts');
+      } else {
+        setError(response.data.message);
+      }
+    } catch (error) {
+      setError('Error logging in.');
     }
   };
 

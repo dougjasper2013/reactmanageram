@@ -1,7 +1,9 @@
 <?php
+
 // register.php
 header('Content-Type: application/json');
 require 'db.php';
+
 
 $data = json_decode(file_get_contents("php://input"));
 

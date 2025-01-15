@@ -1,7 +1,9 @@
 <?php
+
 // contacts.php
 header('Content-Type: application/json');
 require 'db.php';
+
 
 if (!isset($_GET['user'])) {
     echo json_encode(['success' => false, 'message' => 'User is required.']);
